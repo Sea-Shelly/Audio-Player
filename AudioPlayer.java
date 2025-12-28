@@ -76,6 +76,13 @@ public class AudioPlayer {
         clip.loop(Clip.LOOP_CONTINUOUSLY);
     }
 
+    public long getCurrentFrame() {
+        return  clip.getMicrosecondPosition();
+    }
+
+    public long getDuration(){
+        return clip.getMicrosecondLength();
+    }
     public void changeFilePath(String filePath){
         this.filePath = filePath;
     }
