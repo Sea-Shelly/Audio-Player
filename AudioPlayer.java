@@ -86,4 +86,20 @@ public class AudioPlayer {
     public void changeFilePath(String filePath){
         this.filePath = filePath;
     }
+
+    public float getVolume() {
+        FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+        return (float) Math.pow(10f, gainControl.getValue() / 20f);
+    }
+
+    public void setVolume(float volume) {
+        if (volume < 0f || volume > 1f)
+            throw new IllegalArgumentException("Volume not valid: " + volume);
+        FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+        gainControl.setValue(20f * (float) Math.log10(volume));
+    }
+
+    public void addLineListener(LineListener listener){
+        clip.addLineListener(listener);
+    }
 }
