@@ -22,14 +22,8 @@ public class AudioSlider extends JSlider implements MouseListener{
         timer = new Timer(100, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                if(!isUserDragging){
-                   if(audioPlayer.getCurrentFrame() == audioPlayer.getDuration()){
-                       setValue(0);
-                   }else{
-                       setValue((int) audioPlayer.getCurrentFrame());
-                   }
-
+                   setValue((int) audioPlayer.getCurrentFrame());
                }
-
             }
         });
         timer.start();

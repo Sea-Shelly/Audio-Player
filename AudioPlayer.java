@@ -1,4 +1,5 @@
 import javax.sound.sampled.*;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -8,18 +9,24 @@ public class AudioPlayer {
     private String status;
     private AudioInputStream audioInputStream;
     private String filePath;
+    private int loopState;
 
     public AudioPlayer(String file) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
         filePath=file;
         audioInputStream = AudioSystem.getAudioInputStream(new File(filePath).getAbsoluteFile());
         clip = AudioSystem.getClip();
         clip.open(audioInputStream);
-        clip.loop(Clip.LOOP_CONTINUOUSLY);
+        loopState = 0;
         status = "play";
     }
 
     public void play(){
-        clip.start();
+        if(loopState == 0){
+            clip.start();
+        } else{
+            clip.loop(loopState);
+        }
+
         status = "play";
     }
 
@@ -28,7 +35,7 @@ public class AudioPlayer {
             System.out.println("Already Paused");
             return;
         }
-        this.currentFrame = this.clip.getMicrosecondPosition();
+        this.currentFrame = getCurrentFrame();
         clip.stop();
         status = "pause";
     }
@@ -36,6 +43,7 @@ public class AudioPlayer {
     public void resume() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         if(status.equals("play")){
             System.out.println("Already Played");
+            return;
         }
 
         clip.close();
@@ -60,7 +68,7 @@ public class AudioPlayer {
     }
 
     public void jump(long point) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
-        if(point > 0 && point < clip.getMicrosecondLength()){
+        if(point >= 0 && point < clip.getMicrosecondLength()){
             clip.stop();
             clip.close();
             resetAudioStream();
@@ -73,11 +81,10 @@ public class AudioPlayer {
     public void resetAudioStream() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
         audioInputStream = AudioSystem.getAudioInputStream(new File(filePath).getAbsoluteFile());
         clip.open(audioInputStream);
-        clip.loop(Clip.LOOP_CONTINUOUSLY);
     }
 
     public long getCurrentFrame() {
-        return  clip.getMicrosecondPosition();
+        return  clip.getMicrosecondLength() > 0 ? clip.getMicrosecondPosition() % clip.getMicrosecondLength() : 0;
     }
 
     public long getDuration(){
@@ -101,5 +108,36 @@ public class AudioPlayer {
 
     public void addLineListener(LineListener listener){
         clip.addLineListener(listener);
+    }
+
+    public int getLoopState(){
+        return loopState;
+    }
+
+    public void toggleLoop(){
+        switch(loopState){
+            case 0:
+                loopState = 1;
+                break;
+            case 1:
+                loopState = -1;
+                break;
+            case -1:
+                loopState = 0;
+                break;
+        }
+
+        if(status.equals("play")){
+            clip.loop(loopState);
+        }
+    }
+    public void rewind(){
+        clip.setMicrosecondPosition(0);
+        currentFrame = 0L;
+        status = "pause";
+    }
+
+    public boolean isAtEnd(){
+        return clip.getMicrosecondPosition() >= clip.getMicrosecondLength();
     }
 }
