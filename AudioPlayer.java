@@ -69,12 +69,8 @@ public class AudioPlayer {
 
     public void jump(long point) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         if(point >= 0 && point < clip.getMicrosecondLength()){
-            clip.stop();
-            clip.close();
-            resetAudioStream();
+            clip.setMicrosecondPosition(point);
             currentFrame = point;
-            clip.setMicrosecondPosition(currentFrame);
-            this.play();
         }
     }
 
