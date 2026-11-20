@@ -69,6 +69,18 @@ public class Window extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 player.toggleLoop();
+                int state = player.getLoopState();
+                switch(state){
+                    case 0:
+                        loop.setText("Loop");
+                        break;
+                    case 1:
+                        loop.setText("Loop 1");
+                        break;
+                    case -1:
+                        loop.setText("Loop ∞");
+                        break;
+                }
             }
         });
 
